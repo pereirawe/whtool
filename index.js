@@ -92,4 +92,5 @@ app.post('/send', sendText);
 app.post('/sendMedia', sendMidia);
 
 // Ativar o Servidor
-app.listen(9000, () => console.log('Server ready on localhost:9000!'));
+const port = process.env.PORT || 9000;
+app.listen(port, () => console.log('Server ready on localhost:9000!'));
