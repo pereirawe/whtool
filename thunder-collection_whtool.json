@@ -1,0 +1,38 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "whtool",
+    "dateExported": "2022-03-19T11:23:37.412Z",
+    "version": "1.1",
+    "folders": [],
+    "requests": [{
+        "containerId": "",
+        "sortNum": 10000,
+        "headers": [{
+            "name": "Accept",
+            "value": "*/*"
+        }, {
+            "name": "User-Agent",
+            "value": "Thunder Client (https://www.thunderclient.com)"
+        }],
+        "colId": "a0300d12-4dc5-4ff8-9659-566fa007bb86",
+        "name": "sendtext",
+        "url": "localhost:9000/send",
+        "method": "POST",
+        "modified": "2022-03-19T11:23:15.363Z",
+        "created": "2022-03-19T11:22:31.589Z",
+        "_id": "5486ad9e-0534-45a2-8e5c-a1c74cc57474",
+        "params": [],
+        "body": {
+            "type": "formencoded",
+            "raw": "",
+            "form": [{
+                "name": "number",
+                "value": "5541987603488"
+            }, {
+                "name": "message",
+                "value": "Lo logré"
+            }]
+        },
+        "tests": []
+    }]
+}

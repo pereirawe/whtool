@@ -36,12 +36,6 @@ const withOutSession = () => {
         console.log('** O erro de autenticação regenera o QRCODE (Excluir o arquivo session.json) **');
         fs.unlinkSync('./session.json');
     })
-    ws.on('authenticated', () => {
-        dataSession = session;
-        fs.writeFile(SESSION_FILE_PATH, JSON.stringify(session), (err) => {
-            if (err) console.log(err);
-        });
-    });
     ws.initialize();
 }
 
@@ -58,6 +52,7 @@ const sendMessage = (number = null, text = null) => {
     number = number.replace('@c.us', '');
     number = `${number}@c.us`
     const message = text || `Olá, eu sou um BOT`;
+    console.log([number, message])
     ws.sendMessage(number, message);
 }
 
@@ -97,4 +92,4 @@ app.post('/send', sendText);
 app.post('/sendMedia', sendMidia);
 
 // Ativar o Servidor
-app.listen(9000, () => console.log('Server ready!'));
+app.listen(9000, () => console.log('Server ready on localhost:9000!'));
