@@ -1,48 +1,39 @@
 const fs = require('fs');
 const qrcode = require('qrcode-terminal');
-const { Client, MessageMedia } = require('whatsapp-web.js');
+const { Client, MessageMedia, Location, List, Buttons, LocalAuth } = require('whatsapp-web.js');
 const express = require('express');
 const cors = require('cors');
-
-// Inicializamos el bot
-const SESSION_FILE_PATH = './session.json';
-let ws;
-let dataSession;
-
-/**
- * Verificamos se salvamos as credenciais para fazer o login 
- * esta etapa evita verificar novamente o QRCODE
- */
-const withSession = () => {
-    dataSession = require(SESSION_FILE_PATH);
-    ws = new Client({ session: dataSession });
-    ws.on('ready', () => console.log('Cliente está pronto!'));
-    ws.on('auth_failure', () => {
-        console.log('** O erro de autenticação regenera o QRCODE (Excluir o arquivo session.json) **');
-        fs.unlinkSync('./session.json');
-    })
-    ws.initialize();
-}
 
 /**
  * Geramos um QRCODE para iniciar a sessão
  */
-const withOutSession = () => {
-    ws = new Client();
-    // Geramos o QRCODE no Terminal
-    ws.on('qr', qr => { qrcode.generate(qr, { small: true }); });
-    ws.on('ready', () => console.log('Cliente está pronto!'));
-    ws.on('auth_failure', () => {
-        console.log('** O erro de autenticação regenera o QRCODE (Excluir o arquivo session.json) **');
-        fs.unlinkSync('./session.json');
-    })
-    ws.initialize();
-}
+const client = new Client({
+    authStrategy: new LocalAuth(),
+    puppeteer: { headless: false }
+});
 
-/**
- * Verificamos se existe um arquivo com credenciais!
-*/
-(fs.existsSync(SESSION_FILE_PATH)) ? withSession() : withOutSession();
+client.initialize();
+
+// Geramos o QRCODE no Terminal
+client.on('qr', qr => { qrcode.generate(qr, { small: true }); });
+client.on('ready', () => console.log('Cliente está pronto!'));
+
+client.on('authenticated', () => {
+    console.log('AUTHENTICATED');
+});
+
+client.on('auth_failure', msg => {
+    // Fired if session restore was unsuccessful
+    console.error('AUTHENTICATION FAILURE', msg);
+});
+
+client.on('message', async msg => {
+    console.log(JSON.stringify(msg));
+
+    // if (msg.body == '!ping') {
+    //     msg.reply('pong');
+    // }
+});
 
 /**
  * Enviamos uma mensagem simples (texto) ao nosso cliente
@@ -53,20 +44,20 @@ const sendMessage = (number = null, text = null) => {
     number = `${number}@c.us`
     const message = text || `Olá, eu sou um BOT`;
     console.log([number, message])
-    ws.sendMessage(number, message);
+    client.sendMessage(number, message);
 }
 
 /**
  * Enviamos arquivos multimídia para nosso cliente
  * @param {*} number
- * @param {*} fileName
+ * @param {*} file
  * @param {*} caption
  */
-const sendMessageMedia = (number, fileName, caption) => {
+const sendMessageMedia = (number, file, caption) => {
     number = number.replace('@c.us', '');
     number = `${number}@c.us`
-    const media = MessageMedia.fromFilePath(`./media/${fileName}`)
-    ws.sendMessage(number, media, { caption: caption });
+    const media = MessageMedia.fromFilePath(`${file}`)
+    client.sendMessage(number, media, { caption: caption });
 }
 
 // API
